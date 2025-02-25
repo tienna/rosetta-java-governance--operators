@@ -5,7 +5,7 @@
 
 ## Step 1:  construct a request for metadata
 
-Using /construction/preprocess end-point to construct a request for any metadata that is needed for transaction construction
+Using `/construction/preprocess` end-point to construct a request for any metadata that is needed for transaction construction
 ```json
 {
   "metadata": {
@@ -81,7 +81,7 @@ Using /construction/preprocess end-point to construct a request for any metadata
             },
             "metadata": {
                 "staking_credential": {
-        //================= stake address vkey in Hex: which could be retrived by running `cardano-address key inspect <stake.xvk`===
+        // 3.3.============== hex_bytes is stake address vkey in Hex: which could be retrived by running `cardano-address key inspect <stake.xvk`===
                     "hex_bytes": "4cf7c1ccee5015a8dd8e563224eb4f7a07b899775633d4b72336c1aae852797b",   
                     "curve_type": "edwards25519"
                 }
