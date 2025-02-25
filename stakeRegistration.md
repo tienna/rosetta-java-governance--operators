@@ -404,3 +404,4 @@ run the command, we will get the transaction hash returned.
 }
 ```
 and you view transaction on  [cardanoscan](https://preview.cardanoscan.io/transaction/29e5eb1c17ced50091830cac1fca5350857974a2d52983e1dd83980989adb296?tab=stakecertificates)
+![alt text](image-5.png)
