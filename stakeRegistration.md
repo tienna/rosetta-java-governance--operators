@@ -1,6 +1,5 @@
-# Building transactions for stakeRegistration operations in rosetta  to register stake address
-
-## Step 1:  to construct a request for any metadata
+# Building & submitting transactions for stakeRegistration operations in rosetta
+## Step 1:  construct a request for metadata
 
 Using /construction/preprocess end-point to construct a request for any metadata that is needed for transaction construction
 ```
@@ -264,8 +263,8 @@ In this step we use /construction/payloads to generate an unsigned transaction
 
 }
 ```
-## Step 4:  Signing Payloads
-Construction/combine endpoint will creates a network-specific transaction from an unsigned transaction and an array of provided signatures
+## Step 4:  Decoding and Signing Payloads
+ 
 
 ### Step 4.1:  decode unsign rosetta transaction
 
@@ -282,17 +281,19 @@ and click <- icon
 ![alt text](image-1.png)
 
 
-### Step 4.2: Signing transactin using Cardano-cli or Eternl wallet 
+### Step 4.2: Signing transaction
+In this example we use Eternl wallet  to sign transaction, you could use cardano-cli or other tool to sign.
 ```
 a50081825820fd74ccffa72500839245c7d380c7e143bea78e21b4e94b3663d10913e89e067100018182583900855e2f3a1a06bbd0c969977d91e4d9cc44e7c25e95637a0bdf7f542c583623e7e866ac2b3b9ad993261a743f087d65fc5e3c53418fa0b5561b0000000223b49ede021a2f908380031a0467b056048182008200581c583623e7e866ac2b3b9ad993261a743f087d65fc5e3c53418fa0b556
 ```
-add 84 to begining of CBOR
-add A0F5F6 to the end of CBOR
+we convert rosetta unsign transaction to the format that Eternl wallet could understand by:
+- Add 84 to begining of CBOR
+- Add A0F5F6 to the end of CBOR
 
 ```
 84a50081825820fd74ccffa72500839245c7d380c7e143bea78e21b4e94b3663d10913e89e067100018182583900855e2f3a1a06bbd0c969977d91e4d9cc44e7c25e95637a0bdf7f542c583623e7e866ac2b3b9ad993261a743f087d65fc5e3c53418fa0b5561b0000000223b49ede021a2f908380031a0467b056048182008200581c583623e7e866ac2b3b9ad993261a743f087d65fc5e3c53418fa0b556A0F5F6
 ```
-Using Eternl wallet to sign
+copy this CBOR to Eternl wallet to sign
 ![alt text](image-2.png)
 
 Select Download (signed) button to download signed CBOR, you could submit transaction from here or using submit end-point
