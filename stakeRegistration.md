@@ -1,4 +1,4 @@
-# Building & submitting transactions for stakeRegistration operations in rosetta
+# Building & submitting stakeRegistration operations transactions in rosetta
 ## Step 1:  construct a request for metadata
 
 Using /construction/preprocess end-point to construct a request for any metadata that is needed for transaction construction

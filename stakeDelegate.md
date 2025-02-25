@@ -1,4 +1,4 @@
-# Building & submitting transactions for stakeDelegation operations in rosetta
+# Building & submitting stakeDelegation operations transactions in rosetta
 ## 1. Requirements:
 - Your stake address must be registered in advance
 
