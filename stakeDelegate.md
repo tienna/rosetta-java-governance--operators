@@ -1,13 +1,15 @@
 # Building & submitting stakeDelegation operations transactions in rosetta
-## 1. Requirements:
-- Your stake address must be registered in advance
+## Purpose of this document
+This document is written to help Rosetta-java beginners create stakeDelegation request.
+## Requirements:
+- Mnemonic available and saved in `../key/.phrase.prv` file
+- Run `../key/keygen.sh` file to generate payment and stake key pair
+- Run `cardano-address key inspect <stake.xvk` to get hex_bytes of staking_credential
 
 ## Step 1- construct a request for metadata
-Using /construction/preprocess end-point to construct a request for any metadata that is needed for transaction construction
-```
-curl --location 'localhost:8082/construction/preprocess' \
---header 'Content-Type: application/json' \
---data '{
+Using `/construction/preprocess` end-point to construct a request for any metadata that is needed for transaction construction
+```json
+{
   "metadata": {
     "deposit_parameters": {
       "poolDeposit": "500000000",
@@ -21,7 +23,7 @@ curl --location 'localhost:8082/construction/preprocess' \
 
      "operations": [
         {
-        
+        // 1.=====INPUT: You need to indicate the address and UTXO you are going to spend here =====
             "operation_identifier": {
                 "index": 0,
                 "network_index": 0
@@ -45,7 +47,7 @@ curl --location 'localhost:8082/construction/preprocess' \
                 "coin_action": "coin_spent"
             }
         },
-        
+        // 2.=====OUTPUT: You declare new outputs here.=====
         {
             "operation_identifier": {
                 "index": 1
@@ -68,7 +70,7 @@ curl --location 'localhost:8082/construction/preprocess' \
                 }
             }
         },
-        
+        // 3.=====STAKE KEY REGISTRATION  =====
         {
             "operation_identifier": {
                 "index": 2
@@ -76,12 +78,13 @@ curl --location 'localhost:8082/construction/preprocess' \
             "type": "stakeDelegation",
             "status": "",
             "account": {
-        
+        // 3.1.=====The stake address you want to register =====
                 "address": "stake_test1upvrvgl8apn2c2emntvexfs6wslsslt9l30rc56p37st24srqglm6"
             },
             "metadata": {
+                
                 "staking_credential": {
-        
+        // 3.3.===== hex_bytes is stake address vkey in Hex: which could be retrived by running `cardano-address key inspect <stake.xvk`=====
                     "hex_bytes": "4cf7c1ccee5015a8dd8e563224eb4f7a07b899775633d4b72336c1aae852797b",   
                     "curve_type": "edwards25519"
                 },
@@ -89,7 +92,8 @@ curl --location 'localhost:8082/construction/preprocess' \
                 }
         }
     ]
-}'
+}
+
 ```
 
 ## Step 2- to get metadata for transaction construction

@@ -24,7 +24,7 @@ Using `/construction/preprocess` end-point to construct a request for any metada
 
     "operations": [
         {
-        // 1.=====INPUT: You need to indicate the address and UTXO you will spend here =====
+        // 1.=====INPUT: You need to indicate the address and UTXO you are going to spend here =====
             "operation_identifier": {
                 "index": 0,
                 "network_index": 0
@@ -84,7 +84,8 @@ Using `/construction/preprocess` end-point to construct a request for any metada
             },
             "metadata": {
                 "staking_credential": {
-        // 3.3.===== hex_bytes is stake address vkey in Hex: which could be retrived by running `cardano-address key inspect <stake.xvk`=====                   "hex_bytes": "4cf7c1ccee5015a8dd8e563224eb4f7a07b899775633d4b72336c1aae852797b",   
+        // 3.3.===== hex_bytes is stake address vkey in Hex: which could be retrived by running `cardano-address key inspect <stake.xvk`=====             
+                   "hex_bytes": "4cf7c1ccee5015a8dd8e563224eb4f7a07b899775633d4b72336c1aae852797b",   
                     "curve_type": "edwards25519"
                 }
             }
