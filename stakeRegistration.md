@@ -1,12 +1,57 @@
-# Building & submitting stakeRegistration operations transactions in rosetta
+# Building & submitting stakeRegistration operations transactions in Rosetta
 ## Purpose of this document
-This document is written to help Rosetta-java beginners create stakeRegistration request.
+This document is written as step by step guide to support beginners using Rosetta-java to create stakeRegistration request.
 ## Requirements:
-- Mnemonic available and saved in `../key/.phrase.prv` file
-- Run `../key/keygen.sh` file to generate payment and stake key pair
-- Run `cardano-address key inspect <stake.xvk` to get hex_bytes of staking_credential
+- Mnemonic available and saved in .phrase.prv file
+_Mnemonic and private keys are recommended to be stored on an air-gap server, we create stake.xvk and send this file to the transaction editor in step 1_
 
-## Step 1:  construct a request for metadata
+```bash
+$cat .phrase.prv
+write your 24 words of mnemonic in this line 
+```
+Create keygen.sh script
+```bash
+#!/bin/bash
+cat .phrase.prv | cardano-address key from-recovery-phrase Shelley > root.xsk
+cardano-address key child 1852H/1815H/0H/0/0 < root.xsk > payment.xsk
+cardano-address key public --with-chain-code < payment.xsk > payment.xvk
+
+cardano-address key child 1852H/1815H/0H/2/0    < root.xsk > stake.xsk
+cardano-address key public --with-chain-code < stake.xsk > stake.xvk
+
+cardano-address address payment --network-tag testnet < payment.xvk > payment.addr
+cardano-address address stake --network-tag testnet < stake.xvk > stake.addr
+
+cardano-address key hash < stake.xvk > stake.vkh
+cardano-address address delegation $(cat stake.vkh) < payment.addr > base.addr
+rm root.xsk payment.xsk stake.xsk 
+```
+
+Run keygen.sh file to generate payment and stake key pair
+
+```bash
+$chmod u+x keygen.sh
+$./keygen.sh
+```
+Run cardano-address key inspect <stake.xvk to get hex_bytes of staking_credential, this information will be use in step 3.
+
+```bash
+cardano:$ cardano-address key inspect <payment.xvk
+{
+    "chain_code": "f62197d179aa1ad8fbfe5cc6ccca3a8767b6560cc1570a7d463471e9aa65749f",
+    "key_type": "public",
+    "extended_key": "5150e61ddf17c8b0f3346ca58a225b52f9b9ed48efbb4cfb9ccbdf569dff45eb"
+}
+
+cardano:$ cardano-address key inspect <stake.xvk
+{
+    "chain_code": "d4fda1708c7aa20e1da88ead8e7a9013061780e0d7d64000b805067a6bf6b5d6",
+    "key_type": "public",
+    "extended_key": "4cf7c1ccee5015a8dd8e563224eb4f7a07b899775633d4b72336c1aae852797b"
+}
+```
+
+## Step 1: Contructing a request for metadata
 
 Using `/construction/preprocess` end-point to construct a request for any metadata that is needed for transaction construction
 ```json
@@ -103,11 +148,11 @@ The above query will return
     }
 }
 ```
-We will bring this output to the step 2
+We bring this output to the step 2
 
-## Step 2:  to get metadata for transaction construction
+## Step 2: Getting metadata for transaction construction
 
-using `construction/metadata` end point to get metadata for transaction construction
+We use `construction/metadata` end point to get metadata for transaction construction
 
 ```
 curl --location 'localhost:8082/construction/metadata' \
@@ -155,7 +200,7 @@ After running, This end point will return us the output as below, we use this ou
 }
 ```
 
-## Step 3:  Generate an Unsigned Transaction
+## Step 3:  Generating an Unsigned Transaction
 In this step we use `/construction/payloads` end point to generate an unsigned transaction
 
 ```json
@@ -286,7 +331,7 @@ This query will return below output, copy `unsigned_transaction` for Step 4
 ## Step 4:  Decoding and Signing Payloads
  
 
-### Step 4.1:  decode unsign rosetta transaction
+### Step 4.1:  Decode Rosetta unsigned transaction
 
 Access https://cbor.me/, paste the contents of `unsigned_transaction` to the right box
 ```
@@ -307,7 +352,7 @@ a50081825820fd74ccffa72500839245c7d380c7e143bea78e21b4e94b3663d10913e89e06710001
 ```
 
 ### Step 4.2: Signing transaction
-In this example we use Eternl wallet  to sign transaction, you could use cardano-cli or other tool to sign.
+In this example we use Eternl wallet to sign transaction (mnemonic has been imported before in this wallet), you could use cardano-cli or other tool to sign.
 
 _The purpose of this step is to demonstrate that signing a transaction can be done on a different machine than the one that composes and submits the transaction to the blockchain network._
 ```
@@ -317,7 +362,7 @@ we convert rosetta unsign transaction to the format that Eternl wallet could und
 - Add **84** to begining of CBOR
 - Add **A0F5F6** to the end of CBOR
 
-then we have:
+Then we have:
 ```
 84a50081825820fd74ccffa72500839245c7d380c7e143bea78e21b4e94b3663d10913e89e067100018182583900855e2f3a1a06bbd0c969977d91e4d9cc44e7c25e95637a0bdf7f542c583623e7e866ac2b3b9ad993261a743f087d65fc5e3c53418fa0b5561b0000000223b49ede021a2f908380031a0467b056048182008200581c583623e7e866ac2b3b9ad993261a743f087d65fc5e3c53418fa0b556A0F5F6
 ```
@@ -347,7 +392,7 @@ Using https://cbor.nemo157.com/ to decode and see signatures, we need these sign
 
 ### Step 5.2: Submit sign transaction in rosetta
 
-Copy unsign message from Step 4.1 and adding signatures from step 5.1 to `signatures` areas:
+Copy unsigned message from Step 4.1 and adding signatures from step 5.1 to `signatures` areas:
 ```json
 {
     "network_identifier": {
@@ -409,7 +454,7 @@ The output is rosetta signed transaction
 }
 ```
 
-Bring this rosetta signed transaction to submit endpoint
+Bring this rosetta signed transaction to `submit` endpoint
 
 ```json
  {
@@ -420,7 +465,7 @@ Bring this rosetta signed transaction to submit endpoint
   "signed_transaction": "827902dc383461353030383138323538323066643734636366666137323530303833393234356337643338306337653134336265613738653231623465393462333636336431303931336538396530363731303030313831383235383339303038353565326633613161303662626430633936393937376439316534643963633434653763323565393536333761306264663766353432633538333632336537653836366163326233623961643939333236316137343366303837643635666335653363353334313866613062353536316230303030303030323532613666313431303231613030376131323030303331613034363762303536303438313832303038323030353831633538333632336537653836366163326233623961643939333236316137343366303837643635666335653363353334313866613062353536613130303832383235383230353135306536316464663137633862306633333436636135386132323562353266396239656434386566626234636662396363626466353639646666343565623538343033663962646562386562663833643266386536353931393735323666366536396337666662393365353062623336313864626664363734663864653634613464666664666539346266343337356263393439616361666165313861343136363130313366623032303137323661353765323139326432623439363061323830363832353832303463663763316363656535303135613864643865353633323234656234663761303762383939373735363333643462373233333663316161653835323739376235383430313038623332313830386532363739326364343265616435323364616463396165633666303432316339653164656666376237616532386536343865633762313163643665373136316230656133323133616230376163303136656130366664313966653032386161343239323532373263336536373336316233326437303166356636a26a6f7065726174696f6e7382a6746f7065726174696f6e5f6964656e746966696572a265696e646578006d6e6574776f726b5f696e64657800676163636f756e74a16761646472657373786c616464725f7465737431717a7a34757465367267727468357866647874686d7930796d3878796665377a7436326b783773746d616c3467747a6378633337303672783473346e68786b656a766e703561706c7070376b746c7a3738336635727261716b34747170367561746866616d6f756e74a26863757272656e6379a26673796d626f6c6341444168646563696d616c73066576616c75656b2d393938363630373034316b636f696e5f6368616e6765a26f636f696e5f6964656e746966696572a16a6964656e7469666965727842666437346363666661373235303038333932343563376433383063376531343362656137386532316234653934623336363364313039313365383965303637313a306b636f696e5f616374696f6e6a636f696e5f7370656e74667374617475736773756363657373647479706565696e707574a5746f7065726174696f6e5f6964656e746966696572a165696e64657802676163636f756e74a1676164647265737378407374616b655f74657374317570767276676c3861706e326332656d6e7476657866733677736c73736c74396c33307263353670333773743234737271676c6d36686d65746164617461a1727374616b696e675f63726564656e7469616ca2696865785f62797465737840346366376331636365653530313561386464386535363332323465623466376130376238393937373536333364346237323333366331616165383532373937626a63757276655f747970656c65647761726473323535313966737461747573606474797065747374616b654b6579526567697374726174696f6e767472616e73616374696f6e4d6574616461746148657860"
 }
 ```
-run the command, we will get the transaction hash returned.
+After running the query, we will get the transaction hash returned.
 
 ```json
 {
