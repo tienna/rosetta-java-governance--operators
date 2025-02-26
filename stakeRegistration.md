@@ -225,7 +225,7 @@ In this step we use `/construction/payloads` end point to generate an unsigned t
             "operation_identifier": {
                 "index": 2
             },
-            "type": "stakeKeyRegistration",
+            "type": "stakeKeyRegistration", // <---using stakeKeyRegistration type
             "status": "",
             "account": {
         // 3.1.=====The stake address you want to register =====
@@ -233,7 +233,8 @@ In this step we use `/construction/payloads` end point to generate an unsigned t
             },
             "metadata": {
                 "staking_credential": {
-        // 3.3.===== hex_bytes is stake address vkey in Hex: which could be retrived by running `cardano-address key inspect <stake.xvk`=====                   "hex_bytes": "4cf7c1ccee5015a8dd8e563224eb4f7a07b899775633d4b72336c1aae852797b",   
+        // 3.2.===== hex_bytes is stake address vkey in Hex: which could be retrived by running cardano-address key inspect <stake.xvk=====       
+                    "hex_bytes": "4cf7c1ccee5015a8dd8e563224eb4f7a07b899775633d4b72336c1aae852797b",   
                     "curve_type": "edwards25519"
                 }
             }
@@ -293,11 +294,11 @@ Access https://cbor.me/, paste the contents of `unsigned_transaction` to the rig
 ```
 
 it looks as this image, 
-![alt text](image.png)
+![alt text](images/image.png)
 
 and click <- icon 
 
-![alt text](image-1.png)
+![alt text](images/image-1.png)
 
 The CBOR of transaction without payload is:
 
@@ -321,10 +322,10 @@ then we have:
 84a50081825820fd74ccffa72500839245c7d380c7e143bea78e21b4e94b3663d10913e89e067100018182583900855e2f3a1a06bbd0c969977d91e4d9cc44e7c25e95637a0bdf7f542c583623e7e866ac2b3b9ad993261a743f087d65fc5e3c53418fa0b5561b0000000223b49ede021a2f908380031a0467b056048182008200581c583623e7e866ac2b3b9ad993261a743f087d65fc5e3c53418fa0b556A0F5F6
 ```
 copy this CBOR to Eternl wallet to sign
-![alt text](image-2.png)
+![alt text](images/image-2.png)
 
 Select `Download (signed)` button to download signed CBOR, you could submit transaction from here or using submit end-point
-![alt text](image-3.png)
+![alt text](images/image-3.png)
 
 ## Step 5: Submit transaction using `submit` end point
 ** We only perform these below step if you did not use submit function of Eternl wallet**
@@ -339,14 +340,14 @@ Open the file you have download
   "cborHex": "84a50081825820fd74ccffa72500839245c7d380c7e143bea78e21b4e94b3663d10913e89e067100018182583900855e2f3a1a06bbd0c969977d91e4d9cc44e7c25e95637a0bdf7f542c583623e7e866ac2b3b9ad993261a743f087d65fc5e3c53418fa0b5561b0000000252a6f141021a007a1200031a0467b056048182008200581c583623e7e866ac2b3b9ad993261a743f087d65fc5e3c53418fa0b556a100d90102828258205150e61ddf17c8b0f3346ca58a225b52f9b9ed48efbb4cfb9ccbdf569dff45eb58403f9bdeb8ebf83d2f8e659197526f6e69c7ffb93e50bb3618dbfd674f8de64a4dffdfe94bf4375bc949acafae18a41661013fb0201726a57e2192d2b4960a28068258204cf7c1ccee5015a8dd8e563224eb4f7a07b899775633d4b72336c1aae852797b5840108b321808e26792cd42ead523dadc9aec6f0421c9e1deff7b7ae28e648ec7b11cd6e7161b0ea3213ab07ac016ea06fd19fe028aa42925272c3e67361b32d701f5f6"
 }
 ```
-Using https://cbor.nemo157.com/ to decode to see signatures, we need these signatures in the next steps
+Using https://cbor.nemo157.com/ to decode and see signatures, we need these signatures in the next steps
 
-![alt text](image-4.png)
+![alt text](images/image-4.png)
 
 
 ### Step 5.2: Submit sign transaction in rosetta
 
-Copy unsign message from Step 4.1:  decode unsign rosetta transaction and adding signature from step 5.1 to `signatures` areas:
+Copy unsign message from Step 4.1 and adding signatures from step 5.1 to `signatures` areas:
 ```json
 {
     "network_identifier": {
@@ -393,6 +394,7 @@ Copy unsign message from Step 4.1:  decode unsign rosetta transaction and adding
                 "curve_type": "edwards25519"
             },
             "signature_type": "ed25519",
+            //compare with public_key.hex_byte in signature then copy the corresponding signatures here
             "hex_bytes": "108b321808e26792cd42ead523dadc9aec6f0421c9e1deff7b7ae28e648ec7b11cd6e7161b0ea3213ab07ac016ea06fd19fe028aa42925272c3e67361b32d701"
         }
     
@@ -428,4 +430,4 @@ run the command, we will get the transaction hash returned.
 }
 ```
 and you view transaction on  [cardanoscan](https://preview.cardanoscan.io/transaction/29e5eb1c17ced50091830cac1fca5350857974a2d52983e1dd83980989adb296?tab=stakecertificates)
-![alt text](image-5.png)
+![alt text](images/image-5.png)
